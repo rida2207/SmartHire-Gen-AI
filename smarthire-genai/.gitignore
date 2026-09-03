@@ -1,0 +1,28 @@
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python cache files
+_pycache_/
+*.py[cod]
+*$py.class
+
+# Environment variables & Secrets
+.env
+.DS_Store
+
+# Kaggle credentials
+kaggle.json
+
+# Datasets (Local data folders and large files)
+data/
+datasets/
+*.csv
+*.json
+*.zip
+
+# Streamlit or IDE specific folders
+.streamlit/
+.vscode/
