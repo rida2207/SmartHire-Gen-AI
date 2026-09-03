@@ -12,3 +12,4 @@ kagglehub
 ipykernel
 langchain-huggingface
 sentence-transformers
+torchvision
