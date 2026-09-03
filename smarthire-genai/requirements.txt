@@ -10,3 +10,5 @@ python-dotenv
 streamlit
 kagglehub
 ipykernel
+langchain-huggingface
+sentence-transformers
