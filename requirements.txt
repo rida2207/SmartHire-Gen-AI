@@ -10,10 +10,6 @@ python-dotenv
 streamlit
 kagglehub
 ipykernel
-<<<<<<< HEAD
-sentence-transformers
-langchain-huggingface
-=======
 langchain-huggingface
 sentence-transformers
->>>>>>> 1ff57df9dd925e425f4c66d8cba2715970c32b2d
+torchvision
