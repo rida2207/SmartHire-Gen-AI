@@ -11,15 +11,15 @@ from dotenv import load_dotenv
 env_path = Path(__file__).resolve().parent.parent / '.env'
 load_dotenv(dotenv_path=env_path)
 import streamlit as st
-st.set_page_config(page_title="SmartHire GenAI", page_icon="🚀", layout="wide")
+st.set_page_config(page_title="SmartHire GenAI", layout="wide")
 from pypdf import PdfReader
 from src.generate.prompts import (
     JOB_MATCHING_SYSTEM_PROMPT,
     JOB_MATCHING_USER_PROMPT
    )
 from src.parsing.resume_parser import parse_resume
-from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
+from langchain_huggingface import HuggingFaceEmbeddings
 
 if "candidate_profile" not in st.session_state:
     st.session_state.candidate_profile = {
@@ -31,7 +31,7 @@ if "candidate_profile" not in st.session_state:
         "target_role": "",
         "raw_text": ""
     }
-st.title("🚀 SmartHire GenAI - Intelligent Recruitment & Mentor System")
+st.title("SmartHire GenAI - Intelligent Recruitment & Mentor System")
 st.markdown("""
 Welcome to SmartHire! Use the navigation on the left to search candidate resumes, parse CVs, or get AI-powered career suggestions.
 """)
@@ -67,18 +67,16 @@ def format_job_result(result_text: str) -> str:
 @st.cache_resource
 def load_rag_chain():
     vectorstore_path = root_dir / "vectorstore" / "faiss_index"
-
     embeddings = HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
-
     return FAISS.load_local(
         str(vectorstore_path),
         embeddings,
         allow_dangerous_deserialization=True
     )
 
-rag_chain = load_rag_chain()           
+
 st.sidebar.header("Navigation")
 app_mode = st.sidebar.selectbox(
     "Choose a feature",
@@ -94,7 +92,7 @@ if app_mode == "Home":
         st.warning("Vectorstore not found yet. Please run your notebooks/embedding scripts first.")
     st.info("Select a feature from the sidebar to begin.")
 elif app_mode == "Create Profile":
-    st.title("👤 Create Candidate Profile")
+    st.title("Create Candidate Profile")
     st.write("Set up your profile manually or parse it automatically using your resume.")
 
     input_mode = st.radio(
@@ -128,7 +126,7 @@ elif app_mode == "Create Profile":
                         st.success("Resume parsed successfully!")
                         st.rerun()
                     except ConnectionError as e:
-                        st.error(f"🔌 Connection Error: {e}")
+                        st.error(f" Connection Error: {e}")
                         st.info(
                             "**Troubleshooting tips:**\n"
                             "1. Check your internet connection\n"
@@ -137,7 +135,7 @@ elif app_mode == "Create Profile":
                             "4. Try again in a few moments if the API service is temporarily unavailable"
                         )
                     except ValueError as e:
-                        st.error(f"⚙️ Configuration Error: {e}")
+                        st.error(f"Configuration Error: {e}")
                     except Exception as e:
                         st.error(f"Error parsing resume: {e}")
                         with st.expander("Technical Details"):
@@ -151,17 +149,27 @@ elif app_mode == "Create Profile":
         target_role = st.text_input("Target Role", value=st.session_state.candidate_profile["target_role"])
         
         if st.form_submit_button("Save Profile"):
-            current_resume = st.session_state.candidate_profile.get("raw_resume_text", "")
             if not name.strip() or not skills.strip():
-                st.error("⚠️ Please upload a valid resume or provide complete details. It cannot be blank.")
+                st.error("Please upload a valid resume or provide complete details. It cannot be blank.")
             else:
+                existing_resume_text = st.session_state.candidate_profile.get("raw_text", "")
+                profile_resume_text = "\n".join([
+                    f"Name: {name}",
+                    f"Email: {email}",
+                    f"Skills: {skills}",
+                    f"Experience: {exp_years} years",
+                    f"Education: {education}",
+                    f"Target Role: {target_role}",
+                ])
                 st.session_state.candidate_profile.update({
                     "name": name, "email": email, "skills": skills,
-                    "experience_years": exp_years, "education": education, "target_role": target_role
+                    "experience_years": exp_years, "education": education,
+                    "target_role": target_role,
+                    "raw_text": existing_resume_text or profile_resume_text,
                 })
-                st.success("✅ Profile saved globally! Your app is now tied to your data.")
+                st.success("Profile saved globally! Your app is now tied to your data.")
 elif app_mode == "Semantic Job Search":
-    st.subheader("🔍 Semantic Job Search & Matching")
+    st.subheader("Semantic Job Search & Matching")
 
     search_option = st.radio(
         "Choose Search Method:",
@@ -197,7 +205,7 @@ elif app_mode == "Semantic Job Search":
             profile = st.session_state.get("candidate_profile", {})
 
             if not profile or (not profile.get("skills") and not profile.get("target_role")):
-                st.warning("⚠️ Please update your profile first before searching based on your profile!")
+                st.warning("Please update your profile first before searching based on your profile!")
             else:
                 try:
                     candidate_text = f"""
@@ -224,14 +232,14 @@ Target Role: {profile.get('target_role', '')}
              
 
 elif app_mode == "Resume Suggestions":
-    st.subheader("💡 Candidate Resume Improvement & Rewriting")
+    st.subheader("Candidate Resume Improvement & Rewriting")
     profile = st.session_state.get("candidate_profile", {})
     raw_resume_text = profile.get("raw_text", "")
     
     if not raw_resume_text:
-        st.warning("⚠️ No resume found! Please go to *Create Profile* in the sidebar first to upload your resume.")
+        st.warning("No resume found! Please go to *Create Profile* in the sidebar first to upload your resume.")
     else:
-        st.success(f"🔗 Connected to profile: *{profile.get('name', 'Candidate')}*")
+        st.success(f"Connected to profile: *{profile.get('name', 'Candidate')}*")
         job_description = st.text_area("Paste the Target Job Description:")
         col1, col2 = st.columns(2)
         
@@ -246,7 +254,7 @@ elif app_mode == "Resume Suggestions":
                             job_description=job_description
                         )
 
-                        st.markdown("### 🎯 Tailored Recommendations")
+                        st.markdown("Tailored Recommendations:")
                         st.write(suggestions)
                     except Exception as e:
                         st.error(f"Error: {e}")
@@ -254,7 +262,7 @@ elif app_mode == "Resume Suggestions":
                     st.warning("Please paste a target job description first.")
                     
         with col2:
-            if st.button("✨ Rewrite My Resume for This Job"):
+            if st.button("Rewrite My Resume for This Job"):
                 if job_description:
                     with st.spinner("Rewriting your resume to match the target job..."):
                         try:
@@ -279,14 +287,14 @@ elif app_mode == "Resume Suggestions":
                                 contents=prompt,
                             )
                             
-                            st.markdown("### 📝 Your Tailored Resume Version")
+                            st.markdown("Your Tailored Resume Version")
                             st.markdown(response.text)
                         except Exception as e:
                             st.error(f"Error rewriting resume: {e}")
                 else:
                     st.warning("Please paste a target job description first.")
 elif app_mode == "Mentor RAG Chat":
-    st.subheader("💬 AI Career Mentor (RAG)")
+    st.subheader("AI Career Mentor (RAG)")
     if "mentor_messages" not in st.session_state:
         st.session_state.mentor_messages = []
 

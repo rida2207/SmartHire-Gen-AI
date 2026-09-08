@@ -34,7 +34,7 @@ def build_vector_store():
     print(f"Total documents to index: {len(documents)}")
 
     if not documents:
-        print("⚠️ No documents found to embed! Check your data paths.")
+        print("No documents found to embed! Check your data paths.")
         return
 
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
@@ -49,7 +49,7 @@ def build_vector_store():
     output_dir = "vectorstore/faiss_index"
     os.makedirs(output_dir, exist_ok=True)
     vectorstore.save_local(output_dir)
-    print(f"✅ Success! FAISS index saved locally to '{output_dir}'.")
+    print(f"Success! FAISS index saved locally to '{output_dir}'.")
 
 if __name__ == "__main__":
     build_vector_store()

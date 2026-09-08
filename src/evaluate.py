@@ -12,7 +12,7 @@ def evaluate_retrieval():
     print("Starting retrieval evaluation...")
     
     if not os.path.exists(VECTORSTORE_DIR):
-        print(f"❌ Error: Vectorstore directory not found at {VECTORSTORE_DIR}")
+        print(f"Error: Vectorstore directory not found at {VECTORSTORE_DIR}")
         print("Please build your vectorstore using your notebooks first.")
         return False
         
@@ -30,14 +30,14 @@ def evaluate_retrieval():
             for i, doc in enumerate(docs):
                 print(f"\n--- Result {i+1} ---")
                 print(doc.page_content[:200] + "...")
-            print("\n✅ Evaluation passed: Retrieval is working.")
+            print("\nEvaluation passed: Retrieval is working.")
             return True
         else:
-            print("⚠️ Warning: Vectorstore loaded, but zero documents were retrieved.")
+            print("Warning: Vectorstore loaded, but zero documents were retrieved.")
             return False
             
     except Exception as e:
-        print(f"❌ Error during evaluation: {e}")
+        print(f"Error during evaluation: {e}")
         return False
 
 if __name__ == "__main__":

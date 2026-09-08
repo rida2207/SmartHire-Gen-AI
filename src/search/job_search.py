@@ -167,7 +167,7 @@ def test_search():
     output_dir = _resolve_vectorstore_dir()
 
     if not os.path.exists(output_dir):
-        print(f"❌ Error: Index directory not found at {output_dir}")
+        print(f"Error: Index directory not found at {output_dir}")
         return
 
     print("Loading local embeddings and FAISS index...")
